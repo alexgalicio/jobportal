@@ -4,5 +4,28 @@ from . import views
 app_name = 'main'
 
 urlpatterns = [
+    # home and auth
     path('', views.home, name='home'),
+    path('login/', views.custom_login, name='login'),
+    path('register/', views.register, name='register'),
+    path('logout/', views.custom_logout, name='logout'),
+    
+    # job details
+    path('jobs/', views.job_list, name='job_list'),
+    path('jobs/partial/<int:job_id>/', views.job_detail_panel, name='job_detail_panel'),
+    path('jobs/<int:job_id>/', views.job_detail_full, name='job_detail_full'),
+    path('saved/<int:job_id>/', views.toggle_save, name='toggle_save'),
+    
+    # student
+    path('student/', views.student_page, name='student_page'),
+    path('student/applied/', views.applied_jobs, name='applied_jobs'),
+    path('student/apply/<int:job_id>/', views.apply_job, name='apply_job'),
+    path('student/saved/', views.saved_jobs, name='saved_jobs'),
+
+    # employer
+    path('employer/', views.employer_page, name='employer_page'),
+    path('employer/create/', views.create_job, name='create_job'),
+    
+    # user shared page
+    path('profile/', views.profile_view, name='profile'),
 ]
