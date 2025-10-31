@@ -1,0 +1,113 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Title{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Jobs You've Applied For</h2>
+
+  <!-- search -->
+  <form method="get" class="row g-2 mb-4" id="filterForm">
+    <div class="col-md-6">
+      <input type="text" name="search" class="form-control" placeholder="Search by job title or employer..."
+        value="{{ search_query }}">
+    </div>
+
+    <!-- filter -->
+    <div class="col-md-3">
+      <select name="status" class="form-select" onchange="document.getElementById('filterForm').submit()">
+        <option value="">All Statuses</option>
+        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+        <option value="accepted" {% if status_filter == 'accepted' %}selected{% endif %}>Accepted</option>
+        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+      </select>
+    </div>
+
+    <!-- filter button -->
+    <div class="col-md-3">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+  </form>
+
+  <!-- table -->
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Job Title</th>
+          <th>Company</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Applied On</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for application in jobs %}
+        <tr>
+          <td>{{ application.job.title }}</td>
+          <td>
+            {{ application.job.employer.userprofile.employerprofile.company_name }}
+          </td>
+          <td>{{ application.job.location }}</td>
+          <td>
+            <span class="badge
+                  {% if application.status == 'accepted' %}
+                      bg-success
+                  {% elif application.status == 'rejected' %}
+                      bg-danger
+                  {% else %}
+                      bg-secondary
+                  {% endif %}
+                ">
+              {{ application.get_status_display }}
+            </span>
+          </td>
+          <td>{{ application.applied_at|date:"M d, Y" }}</td>
+          <td>
+            <a href="{% url 'main:job_detail_full' application.job.id %}" class="btn btn-outline-primary btn-sm"
+              target="_blank" rel="noopener noreferrer">
+              View
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" rowspan="2" class="text-center py-5">
+            No results.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- pagination -->
+  {% if jobs.has_other_pages %}
+  <nav>
+    <ul class="pagination">
+      {% if jobs.has_previous %}
+      <li class="page-item">
+        <a class="page-link"
+          href="?page={{ jobs.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+      </li>
+      {% endif %}
+      {% for i in jobs.paginator.page_range %}
+      <li class="page-item {% if jobs.number == i %}active{% endif %}">
+        <a class="page-link"
+          href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{
+          i }}</a>
+      </li>
+      {% endfor %}
+      {% if jobs.has_next %}
+      <li class="page-item">
+        <a class="page-link"
+          href="?page={{ jobs.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+</div>
+{% endblock %}

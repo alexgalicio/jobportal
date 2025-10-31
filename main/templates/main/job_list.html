@@ -1,0 +1,248 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Title{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="container py-4">
+
+    <!-- search and filter -->
+    <div class="card mb-4 border">
+      <div class="card-body p-4">
+        <form method="get">
+          <!-- main search row -->
+          <div class="row g-2 mb-3">
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search search-icon"></i></span>
+                <input type="text" class="form-control form-control-lg" id="search" name="search"
+                  value="{{ search_query }}" placeholder="Job title, keywords, or company">
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-geo-alt search-icon"></i></span>
+                <input type="text" class="form-control form-control-lg" id="location" name="location"
+                  value="{{ location_query }}" placeholder="City or province">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary btn-lg w-100">Find jobs</button>
+            </div>
+          </div>
+
+          <!-- filter row -->
+          <div class="row g-2">
+            <div class="col-auto">
+              <div class="filter-dropdown">
+                <select class="form-select" id="workplace" name="workplace" onchange="this.form.submit()">
+                  <option value="">Workplace type</option>
+                  <option value="onsite" {% if workplace_query == 'onsite' %}selected{% endif %}>On-site</option>
+                  <option value="hybrid" {% if workplace_query == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                  <option value="remote" {% if workplace_query == 'remote' %}selected{% endif %}>Remote</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-auto">
+              <div class="filter-dropdown">
+                <select class="form-select" id="work_type" name="work_type" onchange="this.form.submit()">
+                  <option value="">Job type</option>
+                  <option value="full" {% if work_type_query == 'full' %}selected{% endif %}>Full-time</option>
+                  <option value="part" {% if work_type_query == 'part' %}selected{% endif %}>Part-time</option>
+                  <option value="contract" {% if work_type_query == 'contract' %}selected{% endif %}>Contract</option>
+                  <option value="casual" {% if work_type_query == 'casual' %}selected{% endif %}>Casual</option>
+                </select>
+              </div>
+            </div>
+            {% if search_query or location_query or workplace_query or work_type_query %}
+            <div class="col-auto">
+              <a href="?" class="btn btn-link text-decoration-none">Clear filters</a>
+            </div>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- results -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h4 mb-0">
+        {% if jobs %}
+        {{ jobs|length }} job{{ jobs|pluralize }} found
+        {% else %}
+        No jobs found
+        {% endif %}
+      </h2>
+    </div>
+
+    <!-- job listing -->
+    <div class="row">
+      <div class="col-lg-5">
+        {% for job in jobs.object_list %}
+        <!-- job card -->
+        <div class="card job-card mb-3" onclick="showJob({{ job.id }})">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-1">
+              <div>
+                <h5 class="card-title mb-0">{{ job.title }}</h5>
+                <p>{{ job.employer.userprofile.employerprofile.company_name }}</p>
+              </div>
+              {% if job.employer.userprofile.employerprofile.logo %}
+              <img src="{{ job.employer.userprofile.employerprofile.logo.url }}" alt="Logo" class="rounded"
+                style="width: 60px; height: 60px; object-fit: contain;">
+              {% endif %}
+            </div>
+
+            <p class="mb-0">{{ job.location }}</p>
+            <p>₱{{ job.pay_min }} - ₱{{ job.pay_max }} per month</p>
+            <p class="card-text text-muted">{{ job.summary|truncatewords:30 }}</p>
+
+            <!-- save button -->
+            <div class="d-flex align-items-center justify-content-between">
+              <p class="text-muted mb-0">{{ job.created_at|timesince }} ago</p>
+              {% if user.is_authenticated %}
+              <button class="btn btn-link p-0"
+                onclick="event.stopPropagation(); toggleSave({{ job.id }}, this)" title="Save job">
+                {% if job.id in saved_jobs %}
+                <i class="bi bi-bookmark-fill text-primary fs-4"></i>
+                {% else %}
+                <i class="bi bi-bookmark fs-4"></i>
+                {% endif %}
+              </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% empty %}
+        <div class="card text-center py-5">
+          <div class="card-body">
+            <i class="bi bi-briefcase text-muted" style="font-size: 3rem;"></i>
+            <h3 class="h5 mt-3 text-muted">No jobs found</h3>
+            <p class="text-muted">Try adjusting your search or filters</p>
+          </div>
+        </div>
+        {% endfor %}
+
+        <!-- pagination -->
+        {% if jobs.has_other_pages %}
+        <nav class="mt-3">
+          <ul class="pagination">
+            {% if jobs.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                href="?page={{ jobs.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+            </li>
+            {% endif %}
+            {% for i in jobs.paginator.page_range %}
+            <li class="page-item {% if jobs.number == i %}active{% endif %}">
+              <a class="page-link"
+                href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{
+                i }}</a>
+            </li>
+            {% endfor %}
+            {% if jobs.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                href="?page={{ jobs.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+
+      <!-- job details sidebar -->
+      <div class="col-lg-7">
+        <div class="card sticky-top" style="top: 20px;">
+          <div class="card-body">
+            <div id="job-details">
+              <div class="text-center text-muted py-5">
+                <p>Select a job to view details</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .job-card {
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 8px;
+    border: 1px solid #e9ecef !important;
+  }
+
+  .job-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #2557a7 !important;
+  }
+
+  .job-card.active {
+    border: 2px solid #2557a7 !important;
+    background-color: #f8f9ff;
+    box-shadow: 0 4px 12px rgba(37, 87, 167, 0.15);
+  }
+</style>
+
+
+<script>
+  function showJob(jobId) {
+    // remove active class from all cards
+    document.querySelectorAll('.job-card').forEach(c => c.classList.remove('active'));
+
+    // add active to clicked card
+    event.currentTarget.classList.add('active');
+
+    // fetch job details 
+    fetch(`/jobs/partial/${jobId}`)
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('job-details').innerHTML = html;
+      });
+  }
+
+  function toggleSave(jobId, btn) {
+    // send request to save/unsave job
+    fetch(`/saved/${jobId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'), // required for django post request
+      },
+    })
+      .then(response => response.json()) // turn response into json
+      .then(data => {
+        const icon = btn.querySelector('i'); // get icon element 
+        if (data.is_saved) {
+          // if saved fill bookmark
+          icon.classList.remove('bi-bookmark');
+          icon.classList.add('bi-bookmark-fill', 'text-primary');
+        } else {
+          icon.classList.remove('bi-bookmark-fill', 'text-primary');
+          icon.classList.add('bi-bookmark');
+        }
+      });
+  }
+
+  // get csrf token
+  function getCookie(name) {
+    let cookieValue = null;
+    // check if cookie exist in document
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // if cookie name match, get the value
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+{% endblock %}

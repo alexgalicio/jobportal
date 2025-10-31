@@ -1,0 +1,164 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Title{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <!-- back button -->
+      <a
+        href="{% url 'main:job_list' %}"
+        class="btn btn-outline-secondary mb-4"
+      >
+        <i class="bi bi-arrow-left me-2"></i>Back to Jobs
+      </a>
+
+      <!-- job detail card -->
+      <div class="card">
+        <div class="card-body p-4">
+          <!-- job header -->
+          <div class="mb-4">
+            {% if job.employer.userprofile.employerprofile.logo %}
+            <img
+              src="{{ job.employer.userprofile.employerprofile.logo.url }}"
+              alt="Logo"
+              class="rounded mb-3"
+              style="width: 80px; height: 80px; object-fit: contain"
+            />
+            {% endif %}
+            <h3 class="mb-0">{{ job.title }}</h3>
+            <p class="text-muted mb-2">
+              {{ job.employer.userprofile.employerprofile.company_name }}
+            </p>
+
+            <div class="mb-3 small">
+              <p class="mb-2">
+                <i class="bi bi-geo-alt me-2"></i> {{ job.location }}
+              </p>
+              <p class="mb-2">
+                <i class="bi bi-clock me-2"></i> {{ job.get_work_type_display }}
+              </p>
+              <p class="mb-2">
+                <i class="bi bi-briefcase me-2"></i> {{ job.get_workplace_display }}
+              </p>
+              <p class="mb-2">
+                <i class="bi bi-cash me-2"></i> ₱{{ job.pay_min }} - ₱{{ job.pay_max }} per month
+              </p>
+            </div>
+
+            <p class="text-muted small">
+              Posted {{ job.created_at|timesince }} ago
+            </p>
+
+            {% if user.is_authenticated %} {% if has_applied %}
+            <button class="btn btn-secondary w-100 mt-3" disabled>
+              <i class="bi bi-check-circle"></i> Already Applied
+            </button>
+            {% else %}
+
+            <form action="{% url 'main:apply_job' job.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary w-100 mt-3">
+                <i class="bi bi-send"></i> Apply Now
+              </button>
+            </form>
+            
+            {% endif %} {% else %}
+            <a
+              href="{% url 'main:login' %}?next={{ request.path }}"
+              class="btn btn-outline-primary w-100 mt-3"
+            >
+              <i class="bi bi-box-arrow-in-right"></i> Log in to Apply
+            </a>
+            {% endif %}
+          </div>
+
+          <hr />
+
+          <!-- job description -->
+          <div class="mb-4">
+            <h5 class="mb-3">Job Description</h5>
+            <div class="job-description">{{ job.job_description|safe }}</div>
+          </div>
+
+          <!-- job summary -->
+          {% if job.summary %}
+          <div class="mb-4">
+            <h5 class="mb-3">Job Summary</h5>
+            <div class="job-summary">{{ job.summary|linebreaks }}</div>
+          </div>
+          {% endif %}
+
+          <hr />
+
+          <!-- company profile -->
+          <div>
+            <h5 class="mb-3">Company Profile</h5>
+            <div class="card border-0 bg-light">
+              <div class="card-body">
+
+                <!-- company name -->
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                      <i class="bi bi-building-fill me-2 text-primary"></i>
+                      <div>
+                        <small class="text-muted d-block">Company Name</small>
+                        <span>{{ job.employer.userprofile.employerprofile.company_name }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- industry -->
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                      <i class="bi bi-gear me-2 text-primary"></i>
+                      <div>
+                        <small class="text-muted d-block">Industry</small>
+                        <span
+                          >{{ job.employer.userprofile.employerprofile.industry }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- company size -->
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                      <i class="bi bi-people me-2 text-primary"></i>
+                      <div>
+                        <small class="text-muted d-block">Company Size</small>
+                        <span
+                          >{{ job.employer.userprofile.employerprofile.get_company_size_display }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- location -->
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                      <i class="bi bi-geo-alt me-2 text-primary"></i>
+                      <div>
+                        <small class="text-muted d-block">Location</small>
+                        <span>{{ job.employer.userprofile.employerprofile.company_address }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- company description -->
+                <div class="mt-3 pt-3 border-top">
+                  <h6 class="mb-2">About the Company</h6>
+                  <p class="mb-0">
+                    {{ job.employer.userprofile.employerprofile.description }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

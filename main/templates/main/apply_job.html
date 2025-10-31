@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Title{% endblock %}
+
+{% block content %}
+
+<!-- TODO: add otehr fields -->
+<div class="container py-4" style="max-width: 700px;">
+  <h2 class="mb-4">Apply for {{ job.title }}</h2>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Résumé (PDF, DOCX, etc.)</label>
+          {{ form.resume }}
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary">Submit Application</button>
+          <a href="{% url 'main:job_detail_full' job.id %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

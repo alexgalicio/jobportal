@@ -1,0 +1,90 @@
+{% extends 'main/base.html' %}
+{% block title %}Saved jobs{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="mx-auto" style="max-width: 1000px;">
+    <h1 class="h3 mb-4">Saved jobs</h1>
+
+    {% if jobs %}
+    <div class="d-flex flex-column gap-3">
+      {% for job in jobs %}
+      <!-- job card -->
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="d-flex w-100 justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <a href="{% url 'main:job_detail_full' job.id %}" class="job-title text-decoration-none">
+                <h5 class="mb-0 text-dark">{{ job.title }}</h5>
+              </a>
+              <p>{{ job.employer.userprofile.employerprofile.company_name }}</p>
+              <p class="mb-1">{{ job.location }}</p>
+              <p>₱{{ job.pay_min }} - ₱{{ job.pay_max }}/month</p>
+              <p class="text-muted">{{ job.summary|truncatewords:25 }}</p>
+              <p class="mb-0">Posted {{ job.created_at|timesince }} ago</p>
+            </div>
+            <button class="btn btn-link text-danger p-1 remove-btn" onclick="removeSave({{ job.id }}, this)"
+              title="Remove">
+              <i class="bi bi-x-lg h4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- empty state -->
+    {% else %}
+    <div class="d-flex flex-column justify-content-center align-items-center text-center" style="min-height: 70vh;">
+      <i class="bi bi-bookmark fs-1 text-muted"></i>
+      <h4 class="mt-3">No saved jobs yet</h4>
+      <p class="text-muted">Save jobs to review them later</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .job-title:hover h5 {
+    text-decoration: underline;
+  }
+
+  .remove-btn:hover {
+    background-color: #f8d7da;
+    border-radius: 4px;
+  }
+</style>
+
+<script>
+  function removeSave(jobId, btn) {
+    fetch(`/saved/${jobId}/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie('csrftoken') }, // required for django post request
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.is_saved) {
+          btn.closest('.card').remove();
+        }
+      });
+  }
+
+  // get csrf token
+  function getCookie(name) {
+    let cookieValue = null;
+    // check if cookie exist in document
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // if cookie name match, get the value
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+{% endblock %}
