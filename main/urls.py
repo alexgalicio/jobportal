@@ -1,8 +1,6 @@
 from django.urls import path
 from . import views
 
-app_name = 'main'
-
 urlpatterns = [
     # home and auth
     path('', views.home, name='home'),
@@ -17,14 +15,19 @@ urlpatterns = [
     path('saved/<int:job_id>/', views.toggle_save, name='toggle_save'),
     
     # student
-    path('student/', views.student_page, name='student_page'),
+    # path('student/', views.student_page, name='student_page'),
     path('student/applied/', views.applied_jobs, name='applied_jobs'),
     path('student/apply/<int:job_id>/', views.apply_job, name='apply_job'),
     path('student/saved/', views.saved_jobs, name='saved_jobs'),
 
     # employer
-    path('employer/', views.employer_page, name='employer_page'),
+    # path('employer/', views.employer_page, name='employer_page'),
     path('employer/create/', views.create_job, name='create_job'),
+    path('employer/edit/<int:job_id>/', views.edit_job, name='edit_job'),
+    path('employer/my-jobs/', views.my_jobs, name='my_jobs'),
+    path('employer/toggle-status/<int:job_id>/', views.toggle_job_status, name='toggle_job_status'),
+    path('employer/delete/<int:job_id>/', views.delete_job, name='delete_job'),
+    path('employer/<int:job_id>/applications/', views.view_applications, name='view_applications'),
     
     # user shared page
     path('profile/', views.profile_view, name='profile'),
