@@ -1,90 +1,121 @@
 {% extends 'main/base.html' %}
+{% load custom_filters %}
+
 {% block title %}Saved jobs{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <div class="mx-auto" style="max-width: 1000px;">
-    <h1 class="h3 mb-4">Saved jobs</h1>
+<div class="container mt-5 full-height">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <h2 class="mb-0">Saved Jobs</h2>
+    <span>( {{ save_page.paginator.count }} )</span>
+  </div>
 
-    {% if jobs %}
-    <div class="d-flex flex-column gap-3">
-      {% for job in jobs %}
-      <!-- job card -->
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="d-flex w-100 justify-content-between align-items-start">
-            <div class="flex-grow-1">
-              <a href="{% url 'main:job_detail_full' job.id %}" class="job-title text-decoration-none">
-                <h5 class="mb-0 text-dark">{{ job.title }}</h5>
-              </a>
-              <p>{{ job.employer.userprofile.employerprofile.company_name }}</p>
-              <p class="mb-1">{{ job.location }}</p>
-              <p>₱{{ job.pay_min }} - ₱{{ job.pay_max }}/month</p>
-              <p class="text-muted">{{ job.summary|truncatewords:25 }}</p>
-              <p class="mb-0">Posted {{ job.created_at|timesince }} ago</p>
+  <!-- search -->
+  <form method="get" class="d-flex gap-2 mb-4 align-items-center" id="filterForm">
+    <!-- search and button on the left -->
+    <div class="d-flex gap-2 flex-grow-1">
+      <input type="text" name="search" class="form-control" placeholder="Job title or company"
+        value="{{ search_query }}" style="max-width: 400px;">
+
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+
+    <!-- filter -->
+    <div>
+      <select name="status" class="form-select" onchange="document.getElementById('filterForm').submit()">
+        <option value="">All Status</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+      </select>
+    </div>
+  </form>
+
+  {% if save_page %}
+  <div class="list-group">
+    {% for save in save_page %}
+    <!-- job item -->
+    <div class="list-group-item list-group-item-action py-2">
+      <div class="d-flex w-100 justify-content-between align-items-center">
+        <div class="d-flex gap-3 flex-grow-1">
+          <!-- Logo -->
+          {% if save.job.employer.userprofile.employerprofile.logo %}
+          <img src="{{ save.job.employer.userprofile.employerprofile.logo.url }}" alt="Logo" class="rounded"
+            style="width: 50px; height: 50px; object-fit: contain; flex-shrink: 0;">
+          {% endif %}
+
+          <!-- Job Info -->
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="fw-medium">{{ save.job.title }}</span>
+              <span class="badge bg-primary-subtle text-primary rounded-pill">{{ job.get_work_type_display }}</span>
             </div>
-            <button class="btn btn-link text-danger p-1 remove-btn" onclick="removeSave({{ job.id }}, this)"
-              title="Remove">
-              <i class="bi bi-x-lg h4"></i>
-            </button>
+            <div class="d-flex gap-3 small text-muted">
+              <span class="mb-0">
+                <i class="bi bi-geo-alt"></i> {{ save.job.location }}
+              </span>
+              <span>₱{{ save.job.pay_min|format_salary }}-{{ save.job.pay_max|format_salary }}</span>
+                {% if save.job.status == 'expired' %}
+                  <span class="badge bg-danger text-white align-self-center">Expired</span>
+                {% endif %}
+            </div>
           </div>
         </div>
-      </div>
-      {% endfor %}
-    </div>
 
-    <!-- empty state -->
-    {% else %}
-    <div class="d-flex flex-column justify-content-center align-items-center text-center" style="min-height: 70vh;">
-      <i class="bi bi-bookmark fs-1 text-muted"></i>
-      <h4 class="mt-3">No saved jobs yet</h4>
-      <p class="text-muted">Save jobs to review them later</p>
+        <!-- Actions -->
+        <div class="d-flex gap-4">
+          <button class="btn btn-link p-0" onclick="event.stopPropagation(); toggleSave({{ save.job.id }}, this)"
+            title="Save job">
+            {% if save.job.id in saved_jobs %}
+            <i class="bi bi-bookmark-fill text-primary fs-4"></i>
+            {% else %}
+            <i class="bi bi-bookmark fs-4"></i>
+            {% endif %}
+          </button>
+          <a href="{% url 'job_detail_full' save.job.id %}" class="btn btn-outline-primary btn-sm align-self-center">
+            Apply now <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
     </div>
-    {% endif %}
+    {% endfor %}
   </div>
+
+  <!-- empty state -->
+  {% else %}
+  <div class="d-flex flex-column justify-content-center align-items-center text-center mnm-height">
+    <i class="bi bi-bookmark fs-1 text-muted"></i>
+    <h4 class="mt-3 text-muted">No saved jobs yet</h4>
+    <p class="text-muted">Save jobs to review them later</p>
+  </div>
+  {% endif %}
+
+
+  <!-- pagination -->
+  {% if save_page.has_other_pages %}
+  <nav>
+    <ul class="pagination">
+      {% if save_page.has_previous %}
+      <li class="page-item">
+        <a class="page-link"
+          href="?page={{ save_page.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+      </li>
+      {% endif %}
+      {% for i in save_page.paginator.page_range %}
+      <li class="page-item {% if save_page.number == i %}active{% endif %}">
+        <a class="page-link"
+          href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{
+          i }}</a>
+      </li>
+      {% endfor %}
+      {% if save_page.has_next %}
+      <li class="page-item">
+        <a class="page-link"
+          href="?page={{ save_page.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
 </div>
 
-<style>
-  .job-title:hover h5 {
-    text-decoration: underline;
-  }
-
-  .remove-btn:hover {
-    background-color: #f8d7da;
-    border-radius: 4px;
-  }
-</style>
-
-<script>
-  function removeSave(jobId, btn) {
-    fetch(`/saved/${jobId}/`, {
-      method: 'POST',
-      headers: { 'X-CSRFToken': getCookie('csrftoken') }, // required for django post request
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (!data.is_saved) {
-          btn.closest('.card').remove();
-        }
-      });
-  }
-
-  // get csrf token
-  function getCookie(name) {
-    let cookieValue = null;
-    // check if cookie exist in document
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        // if cookie name match, get the value
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
-</script>
 {% endblock %}
