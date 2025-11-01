@@ -66,6 +66,7 @@ class Job(models.Model):
     ]
     
     WORK_TYPE_CHOICES = [
+        ('internship', 'Internship'),
         ('full', 'Full-time'),
         ('part', 'Part-time'),
         ('contract', 'Contract'),
@@ -80,15 +81,16 @@ class Job(models.Model):
     ]
     
     STATUS_CHOICES = [
-        ('open', 'Open'),
-        ('closed', 'Closed'),
+        ('active', 'Active'),
+        ('expired', 'Expired'),
     ]
     
     employer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='jobs')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     title = models.CharField(max_length=200)
     location = models.CharField(max_length=150)
     workplace = models.CharField(max_length=20, choices=WORKPLACE_CHOICES, default='onsite')
-    work_type = models.CharField(max_length=20, choices=WORK_TYPE_CHOICES, default='full')
+    work_type = models.CharField(max_length=20, choices=WORK_TYPE_CHOICES, default='internship')
     pay_type = models.CharField(max_length=20, choices=PAY_TYPE_CHOICES, default='hourly')
     pay_min = models.DecimalField(max_digits=10, decimal_places=2)
     pay_max = models.DecimalField(max_digits=10, decimal_places=2)
@@ -100,16 +102,9 @@ class Job(models.Model):
         return self.title
     
 class Application(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('accepted', 'Accepted'),
-        ('rejected', 'Rejected'),
-    ]
-
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
     applicant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications')
     resume = models.FileField(upload_to='resumes/', blank=True, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     applied_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
