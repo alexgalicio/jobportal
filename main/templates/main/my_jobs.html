@@ -1,0 +1,183 @@
+{% extends 'main/base.html' %}
+{% load custom_filters %}
+
+{% block title %}Title{% endblock %}
+
+{% block content %}
+<div class="container mt-5 full-height">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <h2 class="mb-0">My Jobs</h2>
+    <span>( {{ jobs.paginator.count }} )</span>
+  </div>
+
+  <!-- search -->
+  <form method="get" class="d-flex gap-2 mb-4 align-items-center" id="filterForm">
+    <!-- search and button on the left -->
+    <div class="d-flex gap-2 flex-grow-1">
+      <input type="text" name="search" class="form-control" placeholder="Job title or company"
+        value="{{ search_query }}" style="max-width: 400px;">
+
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+
+    <!-- filter on the right -->
+    <div>
+      <select name="status" class="form-select" onchange="document.getElementById('filterForm').submit()">
+        <option value="">All Status</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+      </select>
+    </div>
+  </form>
+
+  <!-- table -->
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Jobs</th>
+          <th>Status</th>
+          <th>Applications</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>
+            <div class="d-flex flex-column">
+              <span class="fw-medium">{{ job.title }}</span>
+              <div class="d-flex gap-2 small text-muted">
+                <span class="">{{ job.get_work_type_display }}</span>
+                <span>•</span>
+                <span>{{ job.created_at|time_ago }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge
+                  {% if job.status == 'active' %}
+                      bg-success
+                  {% elif job.status == 'expired' %}
+                      bg-danger
+                  {% else %}
+                      bg-secondary
+                  {% endif %}
+                ">
+              {{ job.get_status_display }}
+            </span>
+          </td>
+          <td><i class="bi bi-people"></i> {{ job.app_count }} Applications</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <!-- View Applications -->
+              <a href="{% url 'view_applications' job.id %}" class="btn btn-outline-primary btn-sm">
+                View Applications
+              </a>
+
+              <!-- Dropdown for actions -->
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'edit_job' job.id %}">
+                      <i class="bi bi-pencil-square me-2"></i> Edit
+                    </a>
+                  </li>
+                  <li><button class="dropdown-item" data-bs-toggle="modal"
+                      data-bs-target="#deleteJobModal{{ job.id }}">
+                      <i class="bi bi-trash3 me-2"></i>
+                      Delete</button></li>
+                  <li>
+{% if job.status == 'expired' %}
+<form action="{% url 'toggle_job_status' job.id %}" method="post">
+  {% csrf_token %}
+  <button class="dropdown-item">
+    <i class="bi bi-check-circle me-2"></i> Mark as Active
+  </button>
+</form>
+{% else %}
+<form action="{% url 'toggle_job_status' job.id %}" method="post">
+  {% csrf_token %}
+  <button class="dropdown-item">
+    <i class="bi bi-hourglass-split me-2"></i> Mark as Expired
+  </button>
+</form>
+{% endif %}
+
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </td>
+
+        </tr>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteJobModal{{ job.id }}" tabindex="-1"
+          aria-labelledby="deleteJobModalLabel{{ job.id }}" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteJobModalLabel{{ job.id }}">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to delete <strong>{{ job.title }}</strong>?
+              </div>
+              <div class="modal-footer">
+                <form method="POST" action="{% url 'delete_job' job.id %}">
+                  {% csrf_token %}
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        {% empty %}
+        <tr>
+          <td colspan="7" rowspan="2" class="text-center py-5">
+            No results.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- pagination -->
+  {% if jobs.has_other_pages %}
+  <nav>
+    <ul class="pagination">
+      {% if jobs.has_previous %}
+      <li class="page-item">
+        <a class="page-link"
+          href="?page={{ jobs.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+      </li>
+      {% endif %}
+      {% for i in jobs.paginator.page_range %}
+      <li class="page-item {% if jobs.number == i %}active{% endif %}">
+        <a class="page-link"
+          href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{
+          i }}</a>
+      </li>
+      {% endfor %}
+      {% if jobs.has_next %}
+      <li class="page-item">
+        <a class="page-link"
+          href="?page={{ jobs.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+</div>
+{% endblock %}
