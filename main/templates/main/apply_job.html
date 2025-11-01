@@ -5,21 +5,21 @@
 {% block content %}
 
 <!-- TODO: add otehr fields -->
-<div class="container py-4" style="max-width: 700px;">
-  <h2 class="mb-4">Apply for {{ job.title }}</h2>
+<div class="container py-5 full-height" style="max-width: 700px;">
+  <h2 class="mb-4">Apply Job: {{ job.title }}</h2>
 
   <div class="card shadow-sm">
     <div class="card-body">
       <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="mb-3">
-          <label class="form-label">Résumé (PDF, DOCX, etc.)</label>
+          <label class="form-label">Resume</label>
           {{ form.resume }}
         </div>
 
         <div class="text-end">
           <button type="submit" class="btn btn-primary">Submit Application</button>
-          <a href="{% url 'main:job_detail_full' job.id %}" class="btn btn-outline-secondary">Cancel</a>
+          <a href="{% url 'job_list' %}" class="btn btn-outline-secondary">Cancel</a>
         </div>
       </form>
     </div>
