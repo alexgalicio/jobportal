@@ -1,10 +1,140 @@
 {% extends 'main/base.html' %}
+{% load static %}
+{% load custom_filters %}
 
 {% block title %}Title{% endblock %}
 
 {% block content %}
+<div>
+  <div class="background-section py-5">
+    <!-- hero -->
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6 d-flex flex-column gap-2">
+          <h1>Find a job that suits your interest & skills.</h1>
+          <p>
+            Discover opportunities that match your passion and expertise. Start your journey to a fulfilling career
+            today.
+          </p>
 
-<div class="container mt-5">
-    <h1>homepage</h1>
+          <!-- search -->
+          <form method="get" action="{% url 'job_list' %}">
+            <div class="search-wrapper rounded d-flex align-items-center gap-2 mb-4">
+              <div class="flex-grow-1">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}"
+                    placeholder="Job title, company">
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="flex-grow-1">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                  <input type="text" class="form-control" id="location" name="location" value="{{ location_query }}"
+                    placeholder="City, province">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary search-btn rounded">Find jobs</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- hero image -->
+        <div class="col-lg-6">
+          <img src="{% static 'main/images/hero_bg.png' %}" alt="Hero Image" class="img-fluid hero-img">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- featured jobs -->
+  {% if featured_jobs %}
+  <div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="h4 mb-0">Featured Jobs</h2>
+      <a href="{% url 'job_list' %}" class="btn btn-link text-decoration-none">View all <i
+          class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <div class="row g-3">
+      {% for job in featured_jobs %}
+      <div class="col-md-6 col-lg-4">
+        <a href="{% url 'job_detail_full' job.id %}" class="text-decoration-none text-dark">
+          <div class="card h-100 job-card">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <h5 class="card-title mb-1">{{ job.title }}</h5>
+                  <p class="mb-2">{{ job.employer.userprofile.employerprofile.company_name }}</p>
+                </div>
+                {% if job.employer.userprofile.employerprofile.logo %}
+                <img src="{{ job.employer.userprofile.employerprofile.logo.url }}" alt="Logo"
+                  class="rounded company-logo">
+                {% endif %}
+              </div>
+              <p class="mb-0">{{ job.location }}</p>
+              <p>₱{{ job.pay_min|format_salary }}-{{ job.pay_max|format_salary }} per month</p>
+              <div class="mt-auto d-flex justify-content-between align-items-center">
+                <small class="text-muted">{{ job.created_at|time_ago }}</small>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- cards -->
+  <div class="background-section py-5">
+    <div class="container">
+      <div class="row g-4">
+
+        <!-- student card -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100 overflow-hidden rounded-4">
+            <div class="row g-0 align-items-center">
+              <div class="col-6 p-4">
+                <h4 class="fw-bold">Become a Candidate</h4>
+                <p class="text-muted">
+                  Discover opportunities that match your skills and interests. Build your profile and apply with ease.
+                </p>
+                <a href="{% url 'register' %}" class="btn btn-outline-primary fw-semibold">
+                  Register Now <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+              </div>
+              <div class="col-6">
+                <img src="{% static 'main/images/hero_bg.png' %}" class="img-fluid h-100 w-100 object-fit-cover"
+                  alt="Candidate">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- emplyer card -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100 overflow-hidden rounded-4 bg-primary text-white">
+            <div class="row g-0 align-items-center">
+              <div class="col-6 p-4">
+                <h4 class="fw-bold">Become an Employer</h4>
+                <p>
+                  Post jobs, find qualified candidates, and manage applications — all in one place.
+                </p>
+                <a href="{% url 'register' %}" class="btn btn-light fw-semibold">
+                  Register Now <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+              </div>
+              <div class="col-6">
+                <img src="{% static 'main/images/hero_bg.png' %}" class="img-fluid h-100 w-100 object-fit-cover"
+                  alt="Employer">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
