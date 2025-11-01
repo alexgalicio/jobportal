@@ -1,0 +1,58 @@
+{% extends 'main/base.html' %}
+{% block title %}Applications - {{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 full-height">
+  <h3 class="mb-4">Applications for "{{ job.title }}"</h3>
+
+  {% if applications %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Name</th>
+          <th>Year Level</th>
+          <th>Date Applied</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        {% with student=app.applicant.userprofile.studentprofile %}
+        <tr>
+          <td>{{ student.first_name }} {{ student.last_name }}</td>
+          <td>
+              {% for code, label in student.YEAR_LEVEL_CHOICES %}
+                {% if code == student.year_level %}
+                  {{ label }}
+                {% endif %}
+              {% endfor %}
+            </td>
+          <td>{{ app.applied_at|date:"M d, Y" }}</td>
+          <td>
+            <div class="d-flex gap-2">
+              <a href="{{ app.resume.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-eye"></i> View CV
+              </a>
+              <a href="{{ app.resume.url }}" class="btn btn-outline-primary btn-sm" download>
+                <i class="bi bi-download"></i> Download CV
+              </a>
+              </div>
+          </td>
+        </tr>
+               {% endwith %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+   
+  <div class="d-flex flex-column justify-content-center align-items-center text-center mnm-height">
+    <i class="bi bi-briefcase fs-1 text-muted"></i>
+    <h4 class="mt-3 text-muted">No applications yet</h4>
+    <p class="text-muted">You haven't received any applications for this job yet. Check back soon.</p>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}
