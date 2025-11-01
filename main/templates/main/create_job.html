@@ -4,7 +4,9 @@
 
 {% block content %}
 <div class="container my-5" style="max-width: 700px">
-  <h2 class="mb-4 text-center">Create a Job Posting</h2>
+  <h2 class="mb-4 text-center">
+    {% if is_edit %}Edit Job Posting{% else %}Create a Job Posting{% endif %}
+  </h2>
 
   <form method="POST" novalidate>
     {% csrf_token %}
@@ -24,7 +26,9 @@
     {% endfor %}
 
     <div class="text-center mt-3">
-      <button type="submit" class="btn btn-primary w-100">Create Job</button>
+      <button type="submit" class="btn btn-primary w-100">
+         {% if is_edit %}Save Changes{% else %}Create Job{% endif %}
+      </button>
     </div>
   </form>
 </div>
