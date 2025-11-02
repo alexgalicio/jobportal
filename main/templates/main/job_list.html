@@ -6,11 +6,9 @@
 {% block content %}
 <div class="container-fluid">
   <div class="container py-4">
-
-    <!-- search and filter -->
     <div class="mb-4">
       <form method="get">
-        <!-- search row -->
+        <!-- search -->
         <div class="search-wrapper rounded d-flex align-items-center gap-2 mb-4">
           <div class="flex-grow-1">
             <div class="input-group">
@@ -24,13 +22,13 @@
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
               <input type="text" class="form-control" id="location" name="location" value="{{ location_query }}"
-                placeholder="City, state, zip code, or &quot;remote&quot;">
+                placeholder="City, province">
             </div>
           </div>
-          <button type="submit" class="btn btn-primary search-btn rounded">Find jobs</button>
+          <button type="submit" class="btn btn-primary search-btn rounded">Find job</button>
         </div>
 
-        <!-- filter row -->
+        <!-- filter -->
         <div class="row g-2">
           <div class="col-auto">
             <div class="filter-dropdown">
@@ -172,7 +170,7 @@
           </div>
         </div>
       </div>
-       {% endif %}
+      {% endif %}
     </div>
   </div>
 </div>
