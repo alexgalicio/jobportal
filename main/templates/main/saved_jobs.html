@@ -1,4 +1,5 @@
 {% extends 'main/base.html' %}
+{% load static %}
 {% load custom_filters %}
 
 {% block title %}Saved jobs{% endblock %}
@@ -10,13 +11,11 @@
     <span>( {{ save_page.paginator.count }} )</span>
   </div>
 
-  <!-- search -->
   <form method="get" class="d-flex gap-2 mb-4 align-items-center" id="filterForm">
-    <!-- search and button on the left -->
+    <!-- search -->
     <div class="d-flex gap-2 flex-grow-1">
-      <input type="text" name="search" class="form-control" placeholder="Job title or company"
+      <input type="text" name="search" class="form-control" placeholder="Job title, company, location"
         value="{{ search_query }}" style="max-width: 400px;">
-
       <button type="submit" class="btn btn-primary">Search</button>
     </div>
 
@@ -25,25 +24,26 @@
       <select name="status" class="form-select" onchange="document.getElementById('filterForm').submit()">
         <option value="">All Status</option>
         <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
-        <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+        <option value="closed" {% if status_filter == 'closed' %}selected{% endif %}>Closed</option>
       </select>
     </div>
   </form>
 
   {% if save_page %}
-  <div class="list-group">
+  <div class="list-group mb-4">
     {% for save in save_page %}
     <!-- job item -->
     <div class="list-group-item list-group-item-action py-2">
       <div class="d-flex w-100 justify-content-between align-items-center">
         <div class="d-flex gap-3 flex-grow-1">
-          <!-- Logo -->
           {% if save.job.employer.userprofile.employerprofile.logo %}
-          <img src="{{ save.job.employer.userprofile.employerprofile.logo.url }}" alt="Logo" class="rounded"
-            style="width: 50px; height: 50px; object-fit: contain; flex-shrink: 0;">
+          <img src="{{ save.job.employer.userprofile.employerprofile.logo.url }}" alt="Logo"
+            class="rounded company-logo">
+          {% else %}
+          <!-- TODO: replace with logo -->
+          <img src="{% static 'main/images/hero_bg.png' %}" alt="No Logo" class="rounded company-logo">
           {% endif %}
 
-          <!-- Job Info -->
           <div class="flex-grow-1">
             <div class="d-flex align-items-center gap-2 mb-1">
               <span class="fw-medium">{{ save.job.title }}</span>
@@ -54,14 +54,14 @@
                 <i class="bi bi-geo-alt"></i> {{ save.job.location }}
               </span>
               <span>₱{{ save.job.pay_min|format_salary }}-{{ save.job.pay_max|format_salary }}</span>
-                {% if save.job.status == 'expired' %}
-                  <span class="badge bg-danger text-white align-self-center">Expired</span>
-                {% endif %}
+              {% if save.job.status == 'closed' %}
+              <span class="badge bg-danger text-white align-self-center">Closed</span>
+              {% endif %}
             </div>
           </div>
         </div>
 
-        <!-- Actions -->
+        <!-- actions -->
         <div class="d-flex gap-4">
           <button class="btn btn-link p-0" onclick="event.stopPropagation(); toggleSave({{ save.job.id }}, this)"
             title="Save job">
@@ -71,9 +71,16 @@
             <i class="bi bi-bookmark fs-4"></i>
             {% endif %}
           </button>
+
+          {% if save.job.id in applied_jobs %}
+          <a href="{% url 'applied_jobs' %}" class="btn btn-outline-secondary btn-sm align-self-center">
+            View status <i class="bi bi-arrow-right"></i>
+          </a>
+          {% else %}
           <a href="{% url 'job_detail_full' save.job.id %}" class="btn btn-outline-primary btn-sm align-self-center">
             Apply now <i class="bi bi-arrow-right"></i>
           </a>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -89,7 +96,6 @@
   </div>
   {% endif %}
 
-
   <!-- pagination -->
   {% if save_page.has_other_pages %}
   <nav>
@@ -103,8 +109,7 @@
       {% for i in save_page.paginator.page_range %}
       <li class="page-item {% if save_page.number == i %}active{% endif %}">
         <a class="page-link"
-          href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{
-          i }}</a>
+          href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
       </li>
       {% endfor %}
       {% if save_page.has_next %}
