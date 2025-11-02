@@ -72,7 +72,11 @@
             {% endif %}
           </button>
 
-          {% if save.job.id in applied_jobs %}
+          {% if save.job.status == 'closed' %}
+          <a href="{% url 'job_detail_full' save.job.id %}" class="btn btn-outline-danger btn-sm align-self-center">
+            View details <i class="bi bi-arrow-right"></i>
+          </a>
+          {% elif save.job.id in applied_jobs %}
           <a href="{% url 'applied_jobs' %}" class="btn btn-outline-secondary btn-sm align-self-center">
             View status <i class="bi bi-arrow-right"></i>
           </a>
