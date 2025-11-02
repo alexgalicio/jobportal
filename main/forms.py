@@ -59,6 +59,7 @@ class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = StudentProfile
         fields = [
+            'profile_img',
             'first_name',
             'last_name',
             'phone',
@@ -69,6 +70,7 @@ class StudentProfileForm(forms.ModelForm):
             'bio',
         ]
         widgets = {
+            'profile_img': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your first name'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your last name'}),
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. +63 912 345 6789'}),
