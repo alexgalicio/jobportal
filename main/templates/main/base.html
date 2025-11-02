@@ -37,65 +37,85 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mx-auto">
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+              href="{% url 'home' %}">Home</a>
           </li>
           <li class="nav-item">
             {% if user.userprofile.role == 'employer' %}
-              <a class="nav-link {% if request.resolver_match.url_name == 'my_jobs' %}active{% endif %}" href="{% url 'my_jobs' %}">Jobs</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'my_jobs' %}active{% endif %}"
+              href="{% url 'my_jobs' %}">Jobs</a>
             {% else %}
-              <a class="nav-link {% if request.resolver_match.url_name == 'job_list' %}active{% endif %}" href="{% url 'job_list' %}">Jobs</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'job_list' %}active{% endif %}"
+              href="{% url 'job_list' %}">Jobs</a>
             {% endif %}
           </li>
         </ul>
 
         <div class="d-flex align-items-center">
           {% if user.is_authenticated %}
-          <!-- user dropdown -->
           <div class="dropdown">
-            <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" type="button"
+            <!-- user dropdown button -->
+            <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center gap-2" type="button"
               id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-person-circle me-2"></i>
-              <span>{{ user.username }}</span>
+              {% if user.userprofile.role == 'student' and user.userprofile.studentprofile.profile_img %}
+              <img src="{{ user.userprofile.studentprofile.profile_img.url }}" class="rounded-circle" width="32"
+                height="32" style="object-fit: cover;">
+              {% elif user.userprofile.role == 'employer' and user.userprofile.employerprofile.logo %}
+              <img src="{{ user.userprofile.employerprofile.logo.url }}" class="rounded-circle" width="32" height="32"
+                style="object-fit: cover;">
+              {% else %}
+              <i class="bi bi-person-circle fs-4"></i>
+              {% endif %}
+
+              <div class="d-flex flex-column align-items-start">
+                <span>{{ user.username }}</span>
+                <small class="" style="font-size: 0.75rem;">
+                  {% if user.userprofile.role == 'student' %}
+                  Student
+                  {% elif user.userprofile.role == 'employer' %}
+                  Employer
+                  {% endif %}
+                </small>
+              </div>
             </button>
+
+            <!-- user specific items -->
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li>
                 <a class="dropdown-item" href="{% url 'profile' %}">
-                  <i class="bi bi-person me-2"></i>Profile
+                  <i class="bi bi-person me-2"></i> Profile
                 </a>
               </li>
-
               {% if user.userprofile.role == 'student' %}
               <li>
                 <a class="dropdown-item" href="{% url 'applied_jobs' %}">
-                  <i class="bi bi-check2-square me-2"></i>Applied Jobs
+                  <i class="bi bi-check2-square me-2"></i> Applied Jobs
                 </a>
                 <a class="dropdown-item" href="{% url 'saved_jobs' %}">
-                  <i class="bi bi-bookmark me-2"></i>Saved Jobs
+                  <i class="bi bi-bookmark me-2"></i> Saved Jobs
                 </a>
               </li>
               {% elif user.userprofile.role == 'employer' %}
               <li>
                 <a class="dropdown-item" href="{% url 'create_job' %}">
-                  <i class="bi bi-plus-circle me-2"></i>Create Job
+                  <i class="bi bi-plus-circle me-2"></i> Create Job
                 </a>
                 <a class="dropdown-item" href="{% url 'my_jobs' %}">
-                  <i class="bi bi-list me-2"></i>My Jobs
+                  <i class="bi bi-list me-2"></i> My Jobs
                 </a>
               </li>
               {% endif %}
               <li>
-                <hr class="dropdown-divider" />
+                <hr class="dropdown-divider">
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'logout' %}">
-                  <i class="bi bi-box-arrow-right me-2"></i>Logout
+                  <i class="bi bi-box-arrow-right me-2"></i> Logout
                 </a>
               </li>
             </ul>
           </div>
           {% else %}
-
-          <!-- login/register button -->
           <a class="btn btn-outline-primary me-2" href="{% url 'login' %}">Login</a>
           <a class="btn btn-primary" href="{% url 'register' %}">Register</a>
           {% endif %}
@@ -126,13 +146,14 @@
         </div>
 
         <div class="d-flex flex-wrap gap-5">
-          <!-- student links -->
+          <!-- quick links -->
           <div>
-            <h6 class="fw-bold">Student</h6>
+            <h6 class="fw-bold">Quick Links</h6>
             <ul class="list-unstyled text-muted">
-              <li><a href="#" class="footer-link">Browse Jobs</a></li>
-              <li><a href="#" class="footer-link">Apply Jobs</a></li>
-              <li><a href="#" class="footer-link">Save Jobs</a></li>
+              <li><a href="#" class="footer-link">Home</a></li>
+              <li><a href="{% url 'job_list' %}" class="footer-link">Find Jobs</a></li>
+              <li><a href="{% url 'register' %}" class="footer-link">Sign Up</a></li>
+              <li><a href="{% url 'login' %}" class="footer-link">Login</a></li>
             </ul>
           </div>
 
@@ -140,8 +161,24 @@
           <div>
             <h6 class="fw-bold">Employers</h6>
             <ul class="list-unstyled text-muted">
-              <li><a href="#" class="footer-link">Post a Job</a></li>
-              <li><a href="#" class="footer-link">Browse Candidates</a></li>
+              <li>
+                <a href="{% if user.is_authenticated and user.userprofile.role == 'employer' %}{% url 'create_job' %}{% else %}{% url 'login' %}{% endif %}"
+                  class="footer-link">
+                  Post Jobs
+                </a>
+              </li>
+              <li>
+                <a href="{% if user.is_authenticated and user.userprofile.role == 'employer' %}{% url 'my_jobs' %}{% else %}{% url 'login' %}{% endif %}"
+                  class="footer-link">
+                  Manage Jobs
+                </a>
+              </li>
+              <li>
+                <a href="{% if user.is_authenticated and user.userprofile.role == 'employer' %}{% url 'my_jobs' %}{% else %}{% url 'login' %}{% endif %}"
+                  class="footer-link">
+                  Manage Applications
+                </a>
+              </li>
             </ul>
           </div>
         </div>
