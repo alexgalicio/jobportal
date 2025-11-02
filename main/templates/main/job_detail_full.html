@@ -22,7 +22,11 @@
       <!-- apply button -->
       {% if user.is_authenticated %}
       <div class="d-flex align-items-center gap-2">
-        {% if has_applied %}
+        {% if job.status == 'closed' %}
+        <button class="btn btn-danger" disabled>
+          <i class="bi bi-x-circle me-2"></i> Closed
+        </button>
+        {% elif has_applied %}
         <button class="btn btn-secondary" disabled>
           <i class="bi bi-check-circle me-2"></i> Applied
         </button>
