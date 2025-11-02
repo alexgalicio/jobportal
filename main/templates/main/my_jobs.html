@@ -1,5 +1,4 @@
 {% extends 'main/base.html' %}
-{% load custom_filters %}
 
 {% block title %}Title{% endblock %}
 
@@ -12,20 +11,19 @@
 
   <!-- search -->
   <form method="get" class="d-flex gap-2 mb-4 align-items-center" id="filterForm">
-    <!-- search and button on the left -->
     <div class="d-flex gap-2 flex-grow-1">
-      <input type="text" name="search" class="form-control" placeholder="Job title or company"
+      <input type="text" name="search" class="form-control" placeholder="Job title, company, work type"
         value="{{ search_query }}" style="max-width: 400px;">
 
       <button type="submit" class="btn btn-primary">Search</button>
     </div>
 
-    <!-- filter on the right -->
+    <!-- filter -->
     <div>
       <select name="status" class="form-select" onchange="document.getElementById('filterForm').submit()">
         <option value="">All Status</option>
         <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
-        <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+        <option value="closed" {% if status_filter == 'closed' %}selected{% endif %}>Closed</option>
       </select>
     </div>
   </form>
@@ -35,9 +33,11 @@
     <table class="table table-hover align-middle">
       <thead class="table-light">
         <tr>
-          <th>Jobs</th>
+          <th>Job Title</th>
+          <th>Type</th>
+          <th>Posted Date</th>
           <th>Status</th>
-          <th>Applications</th>
+          <th>Applicants</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -45,40 +45,34 @@
         {% for job in jobs %}
         <tr>
           <td>
-            <div class="d-flex flex-column">
-              <span class="fw-medium">{{ job.title }}</span>
-              <div class="d-flex gap-2 small text-muted">
-                <span class="">{{ job.get_work_type_display }}</span>
-                <span>•</span>
-                <span>{{ job.created_at|time_ago }}</span>
-              </div>
-            </div>
+            <span class="fw-medium">{{ job.title }}</span>
           </td>
+          <td><span class="">{{ job.get_work_type_display }}</span></td>
+          <td>{{ job.created_at|date:"M d, Y H:i" }}</td>
           <td>
             <span class="badge
                   {% if job.status == 'active' %}
                       bg-success
-                  {% elif job.status == 'expired' %}
-                      bg-danger
-                  {% else %}
+                  {% elif job.status == 'closed' %}
                       bg-secondary
                   {% endif %}
                 ">
               {{ job.get_status_display }}
             </span>
           </td>
-          <td><i class="bi bi-people"></i> {{ job.app_count }} Applications</td>
           <td>
-            <div class="d-flex align-items-center gap-2">
-              <!-- View Applications -->
-              <a href="{% url 'view_applications' job.id %}" class="btn btn-outline-primary btn-sm">
-                View Applications
+            <div class="hover-underline">
+              <a href="{% url 'view_applications' job.id %}" class="text-decoration-none">
+                <i class="bi bi-people me-1"></i> {{ job.app_count }}
               </a>
+            </div>
+          </td>
+          <td>
+            <div>
 
-              <!-- Dropdown for actions -->
+              <!-- actions -->
               <div class="dropdown">
-                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown"
-                  aria-expanded="false">
+                <button class="btn  btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -87,36 +81,33 @@
                       <i class="bi bi-pencil-square me-2"></i> Edit
                     </a>
                   </li>
-                  <li><button class="dropdown-item" data-bs-toggle="modal"
-                      data-bs-target="#deleteJobModal{{ job.id }}">
+                  <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteJobModal{{ job.id }}">
                       <i class="bi bi-trash3 me-2"></i>
                       Delete</button></li>
                   <li>
-{% if job.status == 'expired' %}
-<form action="{% url 'toggle_job_status' job.id %}" method="post">
-  {% csrf_token %}
-  <button class="dropdown-item">
-    <i class="bi bi-check-circle me-2"></i> Mark as Active
-  </button>
-</form>
-{% else %}
-<form action="{% url 'toggle_job_status' job.id %}" method="post">
-  {% csrf_token %}
-  <button class="dropdown-item">
-    <i class="bi bi-hourglass-split me-2"></i> Mark as Expired
-  </button>
-</form>
-{% endif %}
-
+                    {% if job.status == 'closed' %}
+                    <form action="{% url 'toggle_job_status' job.id %}" method="post">
+                      {% csrf_token %}
+                      <button class="dropdown-item">
+                        <i class="bi bi-check-circle me-2"></i> Activate
+                      </button>
+                    </form>
+                    {% else %}
+                    <form action="{% url 'toggle_job_status' job.id %}" method="post">
+                      {% csrf_token %}
+                      <button class="dropdown-item">
+                        <i class="bi bi-x-circle me-2"></i> Close
+                      </button>
+                    </form>
+                    {% endif %}
                   </li>
                 </ul>
               </div>
             </div>
           </td>
-
         </tr>
 
-        <!-- Delete Confirmation Modal -->
+        <!-- delete modal -->
         <div class="modal fade" id="deleteJobModal{{ job.id }}" tabindex="-1"
           aria-labelledby="deleteJobModalLabel{{ job.id }}" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
@@ -139,7 +130,6 @@
           </div>
         </div>
 
-
         {% empty %}
         <tr>
           <td colspan="7" rowspan="2" class="text-center py-5">
@@ -150,7 +140,6 @@
       </tbody>
     </table>
   </div>
-
 
   <!-- pagination -->
   {% if jobs.has_other_pages %}
@@ -165,8 +154,7 @@
       {% for i in jobs.paginator.page_range %}
       <li class="page-item {% if jobs.number == i %}active{% endif %}">
         <a class="page-link"
-          href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{
-          i }}</a>
+          href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
       </li>
       {% endfor %}
       {% if jobs.has_next %}
