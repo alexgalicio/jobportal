@@ -27,8 +27,10 @@ urlpatterns = [
     path('employer/my-jobs/', views.my_jobs, name='my_jobs'),
     path('employer/toggle-status/<int:job_id>/', views.toggle_job_status, name='toggle_job_status'),
     path('employer/delete/<int:job_id>/', views.delete_job, name='delete_job'),
-    path('employer/<int:job_id>/applications/', views.view_applications, name='view_applications'),
-    
+    path('employer/applications/<int:job_id>/', views.view_applications, name='view_applications'),
+    path('application/<int:app_id>/accept/', views.accept_application, name='accept_application'),
+    path('application/<int:app_id>/reject/', views.reject_application, name='reject_application'),
+
     # user shared page
     path('profile/', views.profile_view, name='profile'),
 ]
