@@ -114,8 +114,8 @@ def create_job(request):
         return redirect('home')
     
     try:
-        employer_profile = StudentProfile.objects.get(user_profile=profile)
-    except StudentProfile.DoesNotExist:
+        employer_profile = EmployerProfile.objects.get(user_profile=profile)
+    except EmployerProfile.DoesNotExist:
         messages.error(request, "Please complete your profile before creating a job.")
         return redirect('employer_profile')
 
