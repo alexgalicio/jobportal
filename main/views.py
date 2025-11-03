@@ -65,11 +65,6 @@ def employer_profile(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
 
-    # only employers can access
-    if user_profile.role != 'employer':
-        messages.error(request, "You don't have permission to view this page.")
-        return redirect('student_profile')
-
     profile, created = EmployerProfile.objects.get_or_create(
         user_profile=user_profile)
     form = EmployerProfileForm(
@@ -92,11 +87,6 @@ def employer_profile(request):
 def student_profile(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
-
-    # only students can access
-    if user_profile.role != 'student':
-        messages.error(request, "You don't have permission to view this page.")
-        return redirect('employer_profile')
 
     profile, created = StudentProfile.objects.get_or_create(
         user_profile=user_profile)
@@ -123,10 +113,6 @@ def create_job(request):
     except UserProfile.DoesNotExist:
         return redirect('home')
 
-    # only employer can create job
-    if profile.role != 'employer':
-        return redirect('home')
-
     employer_profile = EmployerProfile.objects.get(user_profile=profile)
     required_fields = [
         employer_profile.company_name,
@@ -141,7 +127,7 @@ def create_job(request):
     if not all(required_fields):
         messages.error(
             request, "Please complete your profile before creating a job.")
-        return redirect('profile')
+        return redirect('employer_profile')
 
     if request.method == 'POST':
         form = JobForm(request.POST)
@@ -293,10 +279,6 @@ def apply_job(request, job_id):
     except UserProfile.DoesNotExist:
         return redirect('home')
 
-    # only student can apply job
-    if profile.role != 'student':
-        return redirect('job_list')
-
     # check if student has completed their profile
     student_profile = StudentProfile.objects.get(user_profile=profile)
     required_fields = [
@@ -312,16 +294,10 @@ def apply_job(request, job_id):
     if not all(required_fields):
         messages.error(
             request, "Please complete your profile before applying a job.")
-        return redirect('profile')
+        return redirect('student_profile')
 
     # get job id, return 404 if it doesnt exist
     job = get_object_or_404(Job, id=job_id)
-
-    # check if user already applied
-    # existing_application = Application.objects.filter(job=job, applicant=request.user).first()
-    # if existing_application:
-    #     messages.warning(request, "You already applied for this job.")
-    #     return redirect('job_detail_full', job_id=job.id)
 
     if request.method == 'POST':
         form = ApplicationForm(request.POST, request.FILES)
@@ -475,7 +451,7 @@ def toggle_job_status(request, job_id):
             request, f"'{job.title}' has been marked as active again.")
     else:
         job.status = 'closed'
-        messages.info(request, f"'{job.title}' has been marked closed.")
+        messages.success(request, f"'{job.title}' has been marked closed.")
 
     job.save()
     return redirect('my_jobs')
@@ -532,15 +508,11 @@ def accept_application(request, app_id):
     if request.method == 'POST':
         app = get_object_or_404(Application, id=app_id)
 
-        # if app.job.company != request.user.company:
-        #     messages.error(request, 'You do not have permission to accept this application.')
-        #     return redirect('url')
-
         app.status = 'accepted'
         app.save()
 
         messages.success(
-            request, f'Application from {app.applicant.get_full_name()} has been accepted.')
+            request, f'Application has been accepted.')
 
     return redirect('view_applications', job_id=app.job.id)
 
@@ -550,14 +522,10 @@ def reject_application(request, app_id):
     if request.method == 'POST':
         app = get_object_or_404(Application, id=app_id)
 
-        # if app.job.company != request.user.company:
-        #     messages.error(request, 'You do not have permission to reject this application.')
-        #     return redirect('url')
-
         app.status = 'rejected'
         app.save()
 
         messages.success(
-            request, f'Application from {app.applicant.get_full_name()} has been rejected.')
+            request, f'Application has been rejected.')
 
     return redirect('view_applications', job_id=app.job.id)
