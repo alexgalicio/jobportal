@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container my-5">
   <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-8 p-0">
       {% if messages %}
       <div class="mb-3">
         {% for message in messages %}
@@ -17,162 +17,164 @@
       </div>
       {% endif %}
 
-      <div class="card border-0">
-        <div class="border-bottom py-3">
-          <h2 class="mb-0 text-center"><i class="fas fa-building me-2"></i>Employer Profile</h2>
-        </div>
-        <div class="card-body p-4">
-          <form method="POST" enctype="multipart/form-data" id="employerProfileForm" novalidate>
-            {% csrf_token %}
-
-            <!-- logo -->
-            <div class="row mb-4">
-              <div class="col-md-12">
-                <div class="d-flex gap-4 align-items-center mb-3">
-                  <div class="flex-shrink-0" id="logoPreview">
-                    {% if form.instance.logo %}
-                    <img src="{{ form.instance.logo.url }}" alt="Company Logo" class="image-thumbnail" id="currentLogo"
-                      width="100" height="100">
-                    {% else %}
-                    <div class="logo-placeholder bg-light d-flex align-items-center justify-content-center">
-                      <i class="fas fa-building fa-3x text-muted"></i>
-                    </div>
-                    {% endif %}
-                  </div>
-                  <div class="d-flex flex-column">
-                    <div>
-                      <label for="logoInput" class="btn btn-outline-primary">
-                        <i class="fas fa-upload me-1"></i>Upload Logo
-                      </label>
-                      <input type="file" name="{{ form.logo.name }}" id="logoInput" class="d-none" accept="image/*">
-                      <button type="button" class="btn btn-outline-secondary" id="removeLogo">
-                        <i class="fas fa-trash me-1"></i>Remove
-                      </button>
-                    </div>
-                    <small class="text-muted d-block mt-2">Upload your company logo</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="row mb-4">
-              <!-- personal info -->
-              <div class="col-md-12">
-                <h5 class="border-bottom pb-2 mb-3">Personal Information</h5>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="{{ form.first_name.id_for_label }}" class="form-label">First
-                  Name</label>
-                {{ form.first_name }}
-                {% if form.first_name.errors %}
-                {% for error in form.first_name.errors %}
-                <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-                {% endif %}
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
-                {{ form.last_name }}
-                {% if form.last_name.errors %}
-                {% for error in form.last_name.errors %}
-                <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-                {% endif %}
-              </div>
-
-              <div class="col-12 mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" value="{{ user_email }}" readonly />
-              </div>
-            </div>
-
-            <!-- company info -->
-            <div class="row mb-4">
-              <div class="col-md-12">
-                <h5 class="border-bottom pb-2 mb-3">Company Information</h5>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="{{ form.company_name.id_for_label }}" class="form-label">Company
-                  Name</label>
-                {{ form.company_name }}
-                {% if form.company_name.errors %}
-                {% for error in form.company_name.errors %}
-                <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-                {% endif %}
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="{{ form.industry.id_for_label }}" class="form-label">Industry</label>
-                {{ form.industry }}
-                {% if form.industry.errors %}
-                {% for error in form.industry.errors %}
-                <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-                {% endif %}
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="{{ form.company_size.id_for_label }}" class="form-label">Company
-                  Size</label>
-                {{ form.company_size }}
-                {% if form.company_size.errors %}
-                {% for error in form.company_size.errors %}
-                <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-                {% endif %}
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
-                {{ form.phone }}
-                {% if form.phone.errors %}
-                {% for error in form.phone.errors %}
-                <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-                {% endif %}
-              </div>
-
-              <div class="col-12 mb-3">
-                <label for="{{ form.company_address.id_for_label }}" class="form-label">Company
-                  Address</label>
-                {{ form.company_address }}
-                {% if form.company_address.errors %}
-                {% for error in form.company_address.errors %}
-                <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-                {% endif %}
-              </div>
-            </div>
-
-            <!-- company desc -->
-            <div class="row mb-4">
-              <div class="col-md-12">
-                <h5 class="border-bottom pb-2 mb-3">Company Description</h5>
-                <div class="mb-4">
-                  <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
-                  {{ form.description }}
-                  {% if form.description.errors %}
-                  {% for error in form.description.errors %}
-                  <div class="text-danger small mt-1">{{ error }}</div>
-                  {% endfor %}
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-              <a href="{% url 'my_jobs' %}" class="btn btn-outline-secondary">Cancel</a>
-              <button type="submit" class="btn btn-primary px-4">
-                <i class="fas fa-save me-1"></i>Save Changes
-              </button>
-            </div>
-          </form>
-        </div>
+      <div class="border-bottom py-3 mb-4">
+        <h2 class="mb-0 text-center"><i class="fas fa-building me-2"></i>Employer Profile</h2>
       </div>
+
+      <form method="POST" enctype="multipart/form-data" id="employerProfileForm" novalidate>
+        {% csrf_token %}
+        <!-- logo -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="d-flex gap-4 align-items-center mb-3">
+              <div class="flex-shrink-0" id="logoPreview">
+                {% if form.instance.logo %}
+                <img src="{{ form.instance.logo.url }}" alt="Company Logo" class="image-thumbnail" id="currentLogo"
+                  width="100" height="100">
+                {% else %}
+                <div class="logo-placeholder bg-light d-flex align-items-center justify-content-center">
+                  <i class="fas fa-building fa-3x text-muted"></i>
+                </div>
+                {% endif %}
+              </div>
+              <div class="d-flex flex-column">
+                <div>
+                  <label for="logoInput" class="btn btn-outline-primary">
+                    <i class="fas fa-upload me-1"></i>Upload Logo
+                  </label>
+                  <input type="file" name="{{ form.logo.name }}" id="logoInput" class="d-none" accept="image/*">
+                  <button type="button" class="btn btn-outline-secondary" id="removeLogo">
+                    <i class="fas fa-trash me-1"></i>Remove
+                  </button>
+                </div>
+                <small class="text-muted d-block mt-2">Upload your company logo</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <!-- personal info -->
+          <div class="col-md-12">
+            <h5 class="border-bottom pb-2 mb-3">Personal Information</h5>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.first_name.id_for_label }}" class="form-label">First
+              Name</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+            {% for error in form.first_name.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+            {% for error in form.last_name.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="col-12 mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" value="{{ user_email }}" readonly />
+          </div>
+        </div>
+
+        <!-- company info -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <h5 class="border-bottom pb-2 mb-3">Company Information</h5>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.company_name.id_for_label }}" class="form-label">Company
+              Name</label>
+            {{ form.company_name }}
+            {% if form.company_name.errors %}
+            {% for error in form.company_name.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.industry.id_for_label }}" class="form-label">Industry</label>
+            {{ form.industry }}
+            {% if form.industry.errors %}
+            {% for error in form.industry.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.company_size.id_for_label }}" class="form-label">Company
+              Size</label>
+            {{ form.company_size }}
+            {% if form.company_size.errors %}
+            {% for error in form.company_size.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+            {% for error in form.phone.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="col-12 mb-3">
+            <label class="form-label">Company Address</label>
+            <div class="position-relative">
+              <input type="text" id="location-input" name="location" class="form-control"
+                placeholder="Enter location (e.g. Manila)" autocomplete="off"
+                value="{{ form.company_address.value|default:'' }}" required>
+              <div id="suggestions" class="list-group position-absolute w-100 shadow mt-1" style="z-index: 1050;">
+              </div>
+            </div>
+            {% if form.company_address.errors %}
+            {% for error in form.company_address.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- company desc -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <h5 class="border-bottom pb-2 mb-3">Company Description</h5>
+            <div class="mb-4">
+              <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+              {{ form.description }}
+              {% if form.description.errors %}
+              {% for error in form.description.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+          <a href="{% url 'my_jobs' %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary px-4">
+            <i class="fas fa-save me-1"></i>Save Changes
+          </button>
+        </div>
+      </form>
+
     </div>
   </div>
 </div>
