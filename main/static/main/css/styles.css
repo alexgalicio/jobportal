@@ -135,3 +135,43 @@
 .list-group-item:hover {
   background-color: #f8f9fa;
 }
+
+/* create job */
+.form-step {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rounded-circle {
+  transition: all 0.3s ease;
+}
+
+/* profile */
+#logoPreview {
+  padding: 10px;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+#logoPreview img,
+#logoPreview .logo-placeholder {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.image-thumbnail {
+  border-radius: 8px;
+}
