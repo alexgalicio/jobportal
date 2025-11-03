@@ -136,6 +136,17 @@
   background-color: #f8f9fa;
 }
 
+.job-title-cell {
+  max-width: 350px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.job-title-cell .d-flex.flex-column {
+  min-width: 0;
+}
+
 /* create job */
 .form-step {
   animation: fadeIn 0.3s ease-in-out;
