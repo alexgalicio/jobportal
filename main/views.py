@@ -112,6 +112,12 @@ def create_job(request):
         profile = UserProfile.objects.get(user=request.user)
     except UserProfile.DoesNotExist:
         return redirect('home')
+    
+    try:
+        employer_profile = StudentProfile.objects.get(user_profile=profile)
+    except StudentProfile.DoesNotExist:
+        messages.error(request, "Please complete your profile before creating a job.")
+        return redirect('employer_profile')
 
     employer_profile = EmployerProfile.objects.get(user_profile=profile)
     required_fields = [
@@ -278,6 +284,12 @@ def apply_job(request, job_id):
         profile = UserProfile.objects.get(user=request.user)
     except UserProfile.DoesNotExist:
         return redirect('home')
+    
+    try:
+        student_profile = StudentProfile.objects.get(user_profile=profile)
+    except StudentProfile.DoesNotExist:
+        messages.error(request, "Please complete your profile before applying a job.")
+        return redirect('student_profile')
 
     # check if student has completed their profile
     student_profile = StudentProfile.objects.get(user_profile=profile)
