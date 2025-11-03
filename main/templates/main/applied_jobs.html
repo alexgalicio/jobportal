@@ -44,7 +44,7 @@
       <tbody>
         {% for application in jobs %}
         <tr>
-          <td>
+          <td class="job-title-cell">
             <div class="d-flex align-items-center gap-3">
               {% if application.job.employer.userprofile.employerprofile.logo %}
                 <img src="{{ application.job.employer.userprofile.employerprofile.logo.url }}" 
@@ -56,7 +56,7 @@
               {% endif %}
               <div class="d-flex flex-column">
                 <span class="fw-medium">{{ application.job.title }}</span>
-                <span class="mb-0 small text-muted">
+                <span class="mb-0 small text-muted text-truncate" title="{{ application.job.location }}">
                   <i class="bi bi-geo-alt"></i> {{ application.job.location }}
                 </span>
               </div>
