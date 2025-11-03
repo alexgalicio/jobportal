@@ -182,6 +182,62 @@ document.addEventListener('DOMContentLoaded', function () {
   showStep(1);
 });
 
+// location
+document.addEventListener('DOMContentLoaded', function () {
+  const locationInput = document.getElementById('location-input');
+  const suggestions = document.getElementById('suggestions');
+  let timeout = null;
+
+  locationInput.addEventListener('input', function () {
+    const query = this.value.trim();
+    clearTimeout(timeout);
+
+    if (query.length < 2) {
+      suggestions.innerHTML = '';
+      return;
+    }
+
+    timeout = setTimeout(() => {
+      // use openstreetmap nominatim api, restricted to ph
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=ph&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`)
+        .then(res => res.json())
+        .then(data => {
+          suggestions.innerHTML = '';
+
+          if (data.length === 0) {
+            const noResult = document.createElement('div');
+            noResult.className = 'list-group-item text-muted small';
+            noResult.textContent = 'No results found';
+            suggestions.appendChild(noResult);
+            return;
+          }
+
+          data.forEach(place => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'list-group-item list-group-item-action';
+            item.textContent = place.display_name;
+            item.addEventListener('click', () => {
+              locationInput.value = place.display_name;
+              suggestions.innerHTML = '';
+            });
+            suggestions.appendChild(item);
+          });
+        })
+        .catch(err => {
+          console.error('Error fetching places:', err);
+        });
+    }, 300);
+  });
+
+  // hide dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!suggestions.contains(e.target) && e.target !== locationInput) {
+      suggestions.innerHTML = '';
+    }
+  });
+});
+
 // profile
 document.addEventListener("DOMContentLoaded", function () {
   const logoInput = document.getElementById("logoInput");
