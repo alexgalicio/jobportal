@@ -13,12 +13,6 @@ from .models import Application, Saved, EmployerProfile, Job, StudentProfile, Us
 
 
 def home(request):
-    # if request.user.is_authenticated:
-    #     profile = UserProfile.objects.get(user=request.user)
-    #     # redirect to specific page based on user role
-    #     return redirect('student_page' if profile.role == 'student' else 'employer_page')
-
-    # For visitors (not logged in) — show latest 12 featured jobs
     featured_jobs = Job.objects.filter(status='active').select_related(
         'employer__userprofile__employerprofile').order_by('-created_at')[:9]
 
@@ -65,67 +59,61 @@ def custom_logout(request):
     logout(request)
     return redirect('home')
 
-# @login_required
-# def student_page(request):
-#     profile = UserProfile.objects.get(user=request.user)
-#     if profile.role != 'student':
-#         messages.error(request, 'Access denied. Student access required.')
-#         return redirect('home')
-
-#     context = {
-#         'user': request.user,
-#         'profile': profile
-#     }
-
-#     return render(request, 'main/student_page.html', context)
-
-# @login_required
-# def employer_page(request):
-#     profile = UserProfile.objects.get(user=request.user)
-#     if profile.role != 'employer':
-#         messages.error(request, 'Access denied. Employer access required.')
-#         return redirect('home')
-
-#     context = {
-#         'user': request.user,
-#         'profile': profile
-#     }
-
-#     return render(request, 'main/employer_page.html', context)
-
 
 @login_required
-def profile_view(request):
+def employer_profile(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
 
-    # check role and get the specific profile
-    if user_profile.role == 'student':
-        profile, created = StudentProfile.objects.get_or_create(
-            user_profile=user_profile)
-        form = StudentProfileForm(
-            request.POST or None, request.FILES or None, instance=profile)
-    else:
-        profile, created = EmployerProfile.objects.get_or_create(
-            user_profile=user_profile)
-        form = EmployerProfileForm(
-            request.POST or None, request.FILES or None, instance=profile)
+    # only employers can access
+    if user_profile.role != 'employer':
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('student_profile')
 
-    # auto fill email for display
-    user_email = user.email
+    profile, created = EmployerProfile.objects.get_or_create(
+        user_profile=user_profile)
+    form = EmployerProfileForm(
+        request.POST or None, request.FILES or None, instance=profile)
 
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, 'Profile updated successfully!')
-        return redirect('profile')
+        return redirect('employer_profile')
 
     context = {
         'form': form,
-        'role': user_profile.role,
-        'user_email': user_email,
+        'role': 'employer',
+        'user_email': user.email,
     }
+    return render(request, 'main/employer_profile.html', context)
 
-    return render(request, 'main/profile.html', context)
+
+@login_required
+def student_profile(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+
+    # only students can access
+    if user_profile.role != 'student':
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('employer_profile')
+
+    profile, created = StudentProfile.objects.get_or_create(
+        user_profile=user_profile)
+    form = StudentProfileForm(request.POST or None,
+                              request.FILES or None, instance=profile)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('student_profile')
+
+    context = {
+        'form': form,
+        'role': 'student',
+        'user_email': user.email,
+    }
+    return render(request, 'main/student_profile.html', context)
 
 
 @login_required
@@ -309,7 +297,7 @@ def apply_job(request, job_id):
     if profile.role != 'student':
         return redirect('job_list')
 
-    # Check if student has completed their profile
+    # check if student has completed their profile
     student_profile = StudentProfile.objects.get(user_profile=profile)
     required_fields = [
         student_profile.first_name,
