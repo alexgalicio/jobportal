@@ -18,6 +18,7 @@ class UserProfile(models.Model):
 
 class StudentProfile(models.Model):
     YEAR_LEVEL_CHOICES = [
+        ('', 'Select year level'),
         ('1', '1st Year'),
         ('2', '2nd Year'),
         ('3', '3rd Year'),
@@ -34,7 +35,7 @@ class StudentProfile(models.Model):
     school = models.CharField(max_length=200)
     course = models.CharField(max_length=200)
     year_level = models.CharField(
-        max_length=20, choices=YEAR_LEVEL_CHOICES, default='1')
+        max_length=20, choices=YEAR_LEVEL_CHOICES)
     skills = models.TextField(blank=True, help_text="Comma-separated skills")
     bio = models.TextField(blank=True, max_length=1000)
 
@@ -44,6 +45,7 @@ class StudentProfile(models.Model):
 
 class EmployerProfile(models.Model):
     COMPANY_SIZE_CHOICES = [
+        ('', 'Select no. of employees'),
         ('1-10', '1-10 employees'),
         ('11-50', '11-50 employees'),
         ('51-200', '51-200 employees'),
@@ -60,7 +62,7 @@ class EmployerProfile(models.Model):
     company_address = models.CharField(max_length=300)
     industry = models.CharField(max_length=100)
     company_size = models.CharField(
-        max_length=20, choices=COMPANY_SIZE_CHOICES, default='1-10')
+        max_length=20, choices=COMPANY_SIZE_CHOICES)
     description = models.TextField(max_length=1000)
 
     def __str__(self):
@@ -69,12 +71,14 @@ class EmployerProfile(models.Model):
 
 class Job(models.Model):
     WORKPLACE_CHOICES = [
+        ('', 'Select workplace'),
         ('onsite', 'On-site'),
         ('hybrid', 'Hybrid'),
         ('remote', 'Remote'),
     ]
 
     WORK_TYPE_CHOICES = [
+        ('', 'Select work type'),
         ('internship', 'Internship'),
         ('full', 'Full-time'),
         ('part', 'Part-time'),
@@ -83,6 +87,7 @@ class Job(models.Model):
     ]
 
     PAY_TYPE_CHOICES = [
+        ('', 'Select pay type'),
         ('hourly', 'Hourly rate'),
         ('monthly', 'Monthly salary'),
         ('annual', 'Annual salary'),
@@ -100,16 +105,13 @@ class Job(models.Model):
         max_length=20, choices=STATUS_CHOICES, default='active')
     title = models.CharField(max_length=200)
     location = models.CharField(max_length=150)
-    workplace = models.CharField(
-        max_length=20, choices=WORKPLACE_CHOICES, default='onsite')
-    work_type = models.CharField(
-        max_length=20, choices=WORK_TYPE_CHOICES, default='internship')
-    pay_type = models.CharField(
-        max_length=20, choices=PAY_TYPE_CHOICES, default='hourly')
+    workplace = models.CharField(max_length=20, choices=WORKPLACE_CHOICES)
+    work_type = models.CharField(max_length=20, choices=WORK_TYPE_CHOICES)
+    pay_type = models.CharField(max_length=20, choices=PAY_TYPE_CHOICES)
     pay_min = models.DecimalField(max_digits=10, decimal_places=2)
     pay_max = models.DecimalField(max_digits=10, decimal_places=2)
     job_description = models.TextField()
-    summary = models.TextField()
+    summary = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
