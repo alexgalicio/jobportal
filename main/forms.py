@@ -166,26 +166,6 @@ class JobForm(forms.ModelForm):
             'summary': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Brief summary of the position'}),
         }
 
-    # validate pay range
-    def clean(self):
-        cleaned_data = super().clean()
-        pay_min = cleaned_data.get('pay_min')
-        pay_max = cleaned_data.get('pay_max')
-
-        if pay_min is not None and (pay_min < 1 or pay_min > 4000000):
-            self.add_error(
-                'pay_min', 'Minimum pay must be between 1 and 4,000,000.')
-
-        if pay_max is not None and (pay_max < 1 or pay_max > 4000000):
-            self.add_error(
-                'pay_max', 'Maximum pay must be between 1 and 4,000,000.')
-
-        if pay_min is not None and pay_max is not None and pay_max < pay_min:
-            self.add_error(
-                'pay_max', 'Maximum pay must be greater than or equal to minimum pay.')
-
-        return cleaned_data
-
 
 class ApplicationForm(forms.ModelForm):
     class Meta:
