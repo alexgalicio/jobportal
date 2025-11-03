@@ -81,6 +81,25 @@ class StudentProfileForm(forms.ModelForm):
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Write a short bio about yourself'}),
         }
 
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        phone_digits = re.sub(r'[\s\-\(\)]', '', phone)
+        phone_digits = phone_digits.replace('+', '')
+
+        if phone_digits.startswith('63'):
+            phone_digits = phone_digits[2:]
+
+        if phone_digits.startswith('0'):
+            phone_digits = phone_digits[1:]
+
+        if not phone_digits.isdigit() or len(phone_digits) != 10:
+            raise ValidationError(
+                'Please enter a valid Philippines phone number (e.g., +63 912 345 6789 or 0912 345 6789)')
+
+        formatted_phone = f'+63 {phone_digits[:3]} {phone_digits[3:6]} {phone_digits[6:]}'
+
+        return formatted_phone
+
 
 class EmployerProfileForm(forms.ModelForm):
     class Meta:
