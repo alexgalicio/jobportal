@@ -50,7 +50,7 @@
               <span class="badge bg-primary-subtle text-primary rounded-pill">{{ job.get_work_type_display }}</span>
             </div>
             <div class="d-flex gap-3 small text-muted">
-              <span class="mb-0">
+              <span class="mb-0 text-truncate" style="max-width: 400px;" title="{{ save.job.location }}">
                 <i class="bi bi-geo-alt"></i> {{ save.job.location }}
               </span>
               <span>₱{{ save.job.pay_min|format_salary }}-{{ save.job.pay_max|format_salary }}</span>
