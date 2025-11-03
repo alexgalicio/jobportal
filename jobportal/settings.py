@@ -118,6 +118,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'main' / 'static',
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -130,7 +134,7 @@ LOGOUT_REDIRECT_URL = 'login'
 
 # tinymce
 TINYMCE_DEFAULT_CONFIG = {
-    'height': 300,
+    'height': 400,
     'menubar': False,
     'plugins': 'lists',
     'toolbar': 'h2 | bold italic | bullist numlist | undo redo',
