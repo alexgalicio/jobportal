@@ -64,7 +64,12 @@ A Job Portal for Students built with Django that helps students find jobs and co
    python manage.py migrate
    ```
 
-4. **Start the development server**
+4. **Create superuser (optional)**
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+5. **Start the development server**
    ```bash
    python manage.py runserver
    ```
