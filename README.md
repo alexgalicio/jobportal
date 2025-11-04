@@ -19,10 +19,10 @@ A Job Portal for Students built with Django that helps students find jobs and co
 - **Accept or Reject Applications** – Manage applicants and update their statuses
 
 ## ✨ Screenshots
-
-| Home Page |
-| --- |
-| <img src="main/static/main/images/home_page.png" width="650" alt="Home Page"/> | 
+### 🌐 Landing Page
+| Hero | Featured Jobs | Footer |
+| --- | --- | --- |
+| <img src="main/static/main/images/home_hero.png" width="650" alt="Home Page"/> | <img src="main/static/main/images/home_featured.png" width="650" alt="Home Page"/> | <img src="main/static/main/images/home_footer.png" width="650" alt="Home Page"/> |
 
 ### 🛠️ Student Page
 
