@@ -40,7 +40,7 @@ class StudentProfile(models.Model):
     bio = models.TextField(blank=True, max_length=1000)
 
     def __str__(self):
-        return f"{self.user_profile.user.username} - Student Profile"
+        return self.user_profile.user.username
 
 
 class EmployerProfile(models.Model):
@@ -66,7 +66,7 @@ class EmployerProfile(models.Model):
     description = models.TextField(max_length=1000)
 
     def __str__(self):
-        return f"{self.user_profile.user.username} - Employer Profile"
+        return self.user_profile.user.username
 
 
 class Job(models.Model):
@@ -151,4 +151,4 @@ class Saved(models.Model):
         unique_together = ('user', 'job')
 
     def __str__(self):
-        return f"{self.user.username} saved {self.job.title}"
+        return f"{self.user.username} - {self.job.title}"
