@@ -5,6 +5,7 @@ from .models import Application, UserProfile, StudentProfile, EmployerProfile, J
 from tinymce.widgets import TinyMCE
 import re
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -187,11 +188,18 @@ class JobForm(forms.ModelForm):
 
 
 class ApplicationForm(forms.ModelForm):
+    resume = forms.FileField(
+        required=True,
+        validators=[FileExtensionValidator(
+            allowed_extensions=['pdf', 'doc', 'docx'])],
+        widget=forms.ClearableFileInput(
+            attrs={
+                'class': 'form-control',
+                'accept': '.pdf,.doc,.docx'
+            }
+        )
+    )
+
     class Meta:
         model = Application
         fields = ['resume']
-
-    resume = forms.FileField(
-        required=True,
-        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
-    )
