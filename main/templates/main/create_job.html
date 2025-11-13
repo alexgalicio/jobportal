@@ -53,7 +53,7 @@
       <div class="mb-3 position-relative">
         <label class="form-label">Location <span class="text-danger">*</span></label>
         <input type="text" id="location-input" name="location" class="form-control"
-          placeholder="Enter location (e.g. Manila)" autocomplete="off" value="{{ form.location.value|default:'' }}"
+          placeholder="Enter location (e.g. Bulacan)" autocomplete="off" value="{{ form.location.value|default:'' }}"
           required>
         <div id="suggestions" class="list-group position-absolute w-100 shadow mt-1" style="z-index: 1050;"></div>
         {% if form.location.errors %}
