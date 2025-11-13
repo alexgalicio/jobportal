@@ -57,7 +57,7 @@ def custom_login(request):
 
 def custom_logout(request):
     logout(request)
-    return redirect('home')
+    return redirect('login')
 
 
 @login_required
