@@ -1,8 +1,8 @@
-# 🎓 Job Portal for Students
+# Job Portal for Students
 A Job Portal for Students built with Django that helps students find jobs and connect with potential employers.
 
-## 🚀 Features
-### 👩‍🎓 Students
+## Features
+###  Students
 - **Browse Jobs** - Explore all available jobs in the portal
 - **View Job Details** – Check job details in either full page or a quick side panel view
 - **Apply for Jobs** – Submit applications directly through the portal
@@ -10,7 +10,7 @@ A Job Portal for Students built with Django that helps students find jobs and co
 - **View Saved Jobs** – Access all saved jobs in one place
 - **Track Applications** – View the list of jobs you’ve applied for and monitor application status
 
-### 🏢 Employers
+### Employers
 - **Create Job Listings** – Create new job listings
 - **Edit or Delete Jobs** – Manage job posts
 - **Toggle Job Status** – Mark jobs as active or closed
@@ -18,13 +18,20 @@ A Job Portal for Students built with Django that helps students find jobs and co
 - **View Applications** – Review all student applications for each job
 - **Accept or Reject Applications** – Manage applicants and update their statuses
 
-## ✨ Screenshots
-### 🌐 Landing Page
+## Tech Stack
+- [Django](https://www.djangoproject.com/) – Backend framework
+- [HTML/CSS](https://developer.mozilla.org/en-US/docs/Web) / [Bootstrap](https://getbootstrap.com/) – Frontend
+- [TinyMCE](https://www.tiny.cloud/) – Rich text editor for job descriptions
+- [SQLite](https://www.sqlite.org/index.html) – Default Django database
+
+
+## Screenshots
+### Landing Page
 | Hero | Featured Jobs | Footer |
 | --- | --- | --- |
 | <img src="main/static/main/images/home_hero.png" width="650" alt="Home Page"/> | <img src="main/static/main/images/home_featured.png" width="650" alt="Home Page"/> | <img src="main/static/main/images/home_footer.png" width="650" alt="Home Page"/> |
 
-### 🛠️ Student Page
+### Student Page
 
 | Job List | Job Detail | Apply Job |
 | --- | --- | --- |
@@ -34,7 +41,7 @@ A Job Portal for Students built with Django that helps students find jobs and co
 | --- | --- | --- |
 | <img src="main/static/main/images/student_saves.png" width="650" alt="View Saved Jobs"/> | <img src="main/static/main/images/student_applied.png" width="650" alt="Track Applications"/> | <img src="main/static/main/images/student_profile.png" width="650" alt="Profile"/> |
 
-### 🛠️ Employer Page
+### Employer Page
 
 | Create Job | Manage Jobs |
 | --- | --- |
@@ -45,7 +52,7 @@ A Job Portal for Students built with Django that helps students find jobs and co
 | <img src="main/static/main/images/employer_applicants.png" width="650" alt="Manage Applications"/> | <img src="main/static/main/images/employer_profile.png" width="650" alt="Profile Feed"/> |
 
 
-## ⚙️ Getting Started
+## Getting Started
 
 1. **Clone the repository**
    ```bash
