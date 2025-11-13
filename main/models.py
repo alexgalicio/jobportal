@@ -139,7 +139,7 @@ class Application(models.Model):
         unique_together = ('job', 'applicant')
 
     def __str__(self):
-        return f"{self.applicant.username} - {self.job.title}"
+        return self.applicant.username
 
 
 class Saved(models.Model):
@@ -151,4 +151,4 @@ class Saved(models.Model):
         unique_together = ('user', 'job')
 
     def __str__(self):
-        return f"{self.user.username} - {self.job.title}"
+        return self.user.username
