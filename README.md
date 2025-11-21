@@ -72,7 +72,7 @@ A Job Portal for Students built with Django that helps students find jobs and co
       ```
    * macOS/Linux:
       ```bash
-      venv\Scripts\activate
+      source venv/bin/activate
       ```
 
 3. **Install dependencies**
