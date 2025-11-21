@@ -60,23 +60,38 @@ A Job Portal for Students built with Django that helps students find jobs and co
    cd jobportal
    ```
 
-2. **Install dependencies**
+2. **Create virtual environment**
    ```bash
-   pip install django
+   python -m venv venv
    ```
 
-3. **Run migrations**
+   Activate it:
+   * Windows:
+      ```bash
+      venv\Scripts\activate
+      ```
+   * macOS/Linux:
+      ```bash
+      venv\Scripts\activate
+      ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run migrations**
    ```bash
    python manage.py makemigrations
    python manage.py migrate
    ```
 
-4. **Create superuser (optional)**
+5. **Create superuser (optional)**
    ```bash
    python manage.py createsuperuser
    ```
 
-5. **Start the development server**
+6. **Start the development server**
    ```bash
    python manage.py runserver
    ```
